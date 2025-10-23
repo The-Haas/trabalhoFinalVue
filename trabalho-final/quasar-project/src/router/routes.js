@@ -27,8 +27,17 @@ const routes = [
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')
-  }
+  },
+
+{
+  path: '/cadastro',
+  component: () => import('layouts/CadastroLayout.vue'),
+  children: [
+    { path: '', component: () => import('pages/CadastroPage.vue') }
+  ]
+}
+
+
 ]
 
 export default routes
-  

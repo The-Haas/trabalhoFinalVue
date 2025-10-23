@@ -44,10 +44,10 @@
         />
 
         <!-- Link para criar conta -->
-        <div class="text-center text-caption q-mb-md">
-          Ainda não tem uma conta?
-          <a href="#" class="text-blue">Crie uma conta aqui!</a>
-        </div>
+<div class="text-center text-caption q-mb-md">
+  Ainda não tem uma conta?
+  <router-link to="/cadastro" class="text-blue">Crie uma conta aqui!</router-link>
+</div>
 
         <!-- Redes sociais -->
         <div class="text-center text-caption q-mb-sm">
