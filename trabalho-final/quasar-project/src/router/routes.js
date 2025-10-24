@@ -35,9 +35,7 @@ const routes = [
   children: [
     { path: '', component: () => import('pages/CadastroPage.vue') }
   ]
-},
-
-
+}
 ]
 
 export default routes
