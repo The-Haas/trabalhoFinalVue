@@ -43,7 +43,7 @@
 
         <div class="text-center q-mt-sm">
           Já tem uma conta?
-          <a href="/login">Crie uma conta aqui!</a>
+          <a href="/login">Faça Login aqui!</a>
         </div>
 
         <div class="text-center q-mt-md">

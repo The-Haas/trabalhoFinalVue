@@ -29,13 +29,50 @@ const routes = [
     component: () => import('pages/ErrorNotFound.vue')
   },
 
-{
-  path: '/cadastro',
-  component: () => import('layouts/CadastroLayout.vue'),
-  children: [
-    { path: '', component: () => import('pages/CadastroPage.vue') }
-  ]
-}
+  {
+    path: '/chamados',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ChamadosPage.vue') }
+    ]
+  },
+
+  {
+    path: '/clientes',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ClientesPage.vue') }
+    ]
+  },
+
+  {
+    path: '/cadastro',
+    component: () => import('layouts/CadastroLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CadastroPage.vue') }
+    ]
+  },
+  {
+    path: '/responsaveis',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ResponsaveisPage.vue') }
+    ]
+  },
+  {
+    path: '/status-chamados',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/StatusChamadosPage.vue') }
+    ]
+  },
+  {
+    path: '/departamentos',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/DepartamentosPage.vue') }
+    ]
+  },
 ]
 
 export default routes
