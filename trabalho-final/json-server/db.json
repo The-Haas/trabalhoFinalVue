@@ -1,0 +1,54 @@
+{
+    "login": [
+        {
+            "id": 1,
+            "email": "admin@admin.com",
+            "senha": "admin"
+        }
+    ],
+    "clientes": [
+        {
+            "id": 1,
+            "razao_social": "Horus Faculdades",
+            "nome_fantasia": "Instituição de Ensino Horus",
+            "cnpj": "12.345.678/0001-90",
+            "email": "horus@horus.com",
+            "telefone": "(49) 98765-4321",
+            "status": true
+        }
+    ],
+    "responsaveis": [
+        {
+            "id": 1,
+            "nome": "Ricardo Silva",
+            "email": "ricardo@ricardo.com",
+            "telefone": "(49) 91234-5678",
+            "status": true
+        }
+    ],
+    "status_chamados": [
+        {
+            "id": 1,
+            "descricao": "Aberto",
+            "cor": "#28a745",
+            "status": true
+        }
+    ],
+    "departamentos": [
+        {
+            "id": 1,
+            "nome": "Suporte Técnico",
+            "status": true
+        }
+    ],
+    "chamados": [
+        {
+            "id": 1,
+            "cliente": "Horus Faculdades",
+            "titulo": "Problema no sistema de login",
+            "data_abertura": "25-10-2024",
+            "departamento": "suporte",
+            "status": "Aberto"
+        }
+    ]
+}
