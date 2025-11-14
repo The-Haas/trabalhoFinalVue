@@ -60,31 +60,61 @@
   </q-page>
 </template>
 
-<script>
-export default {
-  name: "CadastroPage",
-  data() {
-    return {
-      email: "",
-      senha: "",
-      confirmarSenha: "",
-    };
-  },
-  methods: {
-    cadastrar() {
-      if (this.senha !== this.confirmarSenha) {
-        this.$q.notify({
-          type: "negative",
-          message: "As senhas não coincidem!",
-        });
-        return;
-      }
-      // Aqui você pode chamar sua API para registrar o usuário
-      console.log("Cadastro realizado com:", this.email, this.senha);
-    },
-  },
-};
+<script setup>
+import { ref } from 'vue'
+import { useRegisterStore } from 'src/stores/registerStore'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+
+const email = ref('')
+const senha = ref('')
+const confirmarSenha = ref('')
+
+const router = useRouter()
+const $q = useQuasar()
+const registerStore = useRegisterStore()
+
+async function cadastrar() {
+  if (!email.value || !senha.value || !confirmarSenha.value) {
+    return $q.notify({
+      type: 'warning',
+      message: 'Preencha todos os campos!'
+    })
+  }
+
+  if (senha.value !== confirmarSenha.value) {
+    return $q.notify({
+      type: 'negative',
+      message: 'As senhas não coincidem!'
+    })
+  }
+
+  const result = await registerStore.cadastrar(
+    email.value.trim().toLowerCase(),
+    senha.value.trim()
+  )
+
+  if (!result.ok) {
+    return $q.notify({
+      type: 'negative',
+      message: result.msg
+    })
+  }
+
+
+$q.notify({
+  type: 'positive',
+  message: 'Cadastro realizado com sucesso!',
+  caption: 'Você já pode fazer login.',
+  icon: 'check_circle',
+  timeout: 2500,
+  position: 'top'
+})
+
+  router.push('/login')
+}
 </script>
+
 
 <style scoped>
 a {

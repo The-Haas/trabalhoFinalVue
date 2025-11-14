@@ -1,54 +1,111 @@
 {
-    "login": [
-        {
-            "id": 1,
-            "email": "admin@admin.com",
-            "senha": "admin"
-        }
-    ],
-    "clientes": [
-        {
-            "id": 1,
-            "razao_social": "Horus Faculdades",
-            "nome_fantasia": "Instituição de Ensino Horus",
-            "cnpj": "12.345.678/0001-90",
-            "email": "horus@horus.com",
-            "telefone": "(49) 98765-4321",
-            "status": true
-        }
-    ],
-    "responsaveis": [
-        {
-            "id": 1,
-            "nome": "Ricardo Silva",
-            "email": "ricardo@ricardo.com",
-            "telefone": "(49) 91234-5678",
-            "status": true
-        }
-    ],
-    "status_chamados": [
-        {
-            "id": 1,
-            "descricao": "Aberto",
-            "cor": "#28a745",
-            "status": true
-        }
-    ],
-    "departamentos": [
-        {
-            "id": 1,
-            "nome": "Suporte Técnico",
-            "status": true
-        }
-    ],
-    "chamados": [
-        {
-            "id": 1,
-            "cliente": "Horus Faculdades",
-            "titulo": "Problema no sistema de login",
-            "data_abertura": "25-10-2024",
-            "departamento": "suporte",
-            "status": "Aberto"
-        }
-    ]
+  "login": [
+    {
+      "id": 1,
+      "email": "admin@admin.com",
+      "senha": "admin"
+    },
+    {
+      "id": 2,
+      "email": "igor@igor",
+      "senha": "igor"
+    },
+    {
+      "id": 3,
+      "email": "teste@teste",
+      "senha": "teste"
+    },
+    {
+      "id": 4,
+      "email": "igor",
+      "senha": "igor"
+    }
+  ],
+  "clientes": [
+    {
+      "id": 1,
+      "razao_social": "Horus Faculdades",
+      "nome_fantasia": "Instituição de Ensino Horus",
+      "cnpj": "12.345.678/0001-90",
+      "email": "horus@horus.com",
+      "telefone": "(49) 98765-4321",
+      "status": true
+    },
+    {
+      "id": 2,
+      "razao_social": "teste",
+      "nome_fantasia": "teste",
+      "cnpj": "23.434.545/6456-65",
+      "email": "teste@#teste",
+      "telefone": "(32) 44356-4567",
+      "status": true
+    },
+    {
+      "id": 3,
+      "razao_social": "treteasr",
+      "nome_fantasia": "twWgf",
+      "cnpj": "44.637.542/7476-74",
+      "email": "6341354513244636",
+      "telefone": "(43) 65453-4532",
+      "status": true
+    }
+  ],
+  "responsaveis": [
+    {
+      "id": 1,
+      "nome": "Ricardo Silva",
+      "email": "ricardo@ricardo.com",
+      "telefone": "(49) 91234-5678",
+      "status": true
+    }
+  ],
+  "status_chamados": [
+    {
+      "id": 1,
+      "descricao": "Aberto",
+      "cor": "#28a745",
+      "status": true
+    }
+  ],
+  "departamentos": [
+    {
+      "id": 1,
+      "nome": "Suporte Técnico",
+      "status": true
+    }
+  ],
+  "chamados": [
+    {
+      "id": 1,
+      "cliente": "Horus Faculdades",
+      "titulo": "Problema no sistema de login",
+      "dataAbertura": "25-10-2024",
+      "departamento": "suporte",
+      "status": "Em Andamento"
+    },
+    {
+      "id": 2,
+      "cliente": "teste",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-14",
+      "departamento": "",
+      "status": "Aberto"
+    },
+    {
+      "id": 3,
+      "cliente": "tee",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-14",
+      "departamento": "Financeiro",
+      "status": "Aberto"
+    },
+    {
+      "id": 4,
+      "cliente": "não existe isso",
+      "titulo": "rteste",
+      "dataAbertura": "2025-11-14",
+      "departamento": "",
+      "status": "Aberto"
+    }
+  ]
 }

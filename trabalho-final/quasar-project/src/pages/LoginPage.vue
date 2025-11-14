@@ -75,7 +75,6 @@
           <div class="text-h6 text-negative">Erro de Login</div>
           <div class="text-body2 q-mt-sm">
             Email ou senha inválidos. <br />
-            Use: <b>admin@admin.com</b> / <b>admin</b>
           </div>
         </q-card-section>
         <q-card-actions align="right">
@@ -89,8 +88,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useLoginStore } from 'src/stores/loginStore'
 
 const router = useRouter()
+const loginStore = useLoginStore()
+
 const email = ref('')
 const senha = ref('')
 const mostrarSenha = ref(false)
@@ -98,22 +100,22 @@ const carregando = ref(false)
 const erroLogin = ref(false)
 
 async function entrar() {
-  if (carregando.value) return
-
-  const e = email.value.trim().toLowerCase()
-  const s = senha.value.trim()
-
   carregando.value = true
-  await new Promise(r => setTimeout(r, 300)) // simula delay
 
-  if (e === 'admin@admin.com' && s === 'admin') {
+  const ok = await loginStore.login(
+    email.value.trim().toLowerCase(),
+    senha.value.trim()
+  )
+
+  carregando.value = false
+
+  if (ok) {
     router.push('/home')
   } else {
     erroLogin.value = true
   }
-
-  carregando.value = false
 }
+
 </script>
 
 <style scoped>
