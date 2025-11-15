@@ -86,6 +86,12 @@
       "descricao": "Aberto",
       "cor": "#28a745",
       "ativo": true
+    },
+    {
+      "id": 2,
+      "descricao": "Recusado",
+      "cor": "#ff00ff",
+      "ativo": true
     }
   ],
   "departamentos": [
@@ -97,6 +103,11 @@
     {
       "id": 2,
       "nome": "Financeiro",
+      "ativo": true
+    },
+    {
+      "id": 3,
+      "nome": "RH",
       "ativo": true
     }
   ],
@@ -132,6 +143,14 @@
       "dataAbertura": "2025-11-15",
       "departamento": "Desenvolvimento",
       "status": "Aberto"
+    },
+    {
+      "id": 6,
+      "cliente": "Horus",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-07",
+      "departamento": "Desenvolvimento",
+      "status": "Em Andamento"
     }
   ]
 }

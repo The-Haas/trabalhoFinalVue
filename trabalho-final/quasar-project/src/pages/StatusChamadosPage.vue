@@ -79,7 +79,8 @@
         <q-separator />
 
         <q-card-section>
-          <q-input v-model="statusAtual.nome" label="Nome do Status" filled class="q-mb-md" />
+          <!-- CORRIGIDO: v-model para descricao -->
+          <q-input v-model="statusAtual.descricao" label="Nome do Status" filled class="q-mb-md" />
 
           <!-- Campo de cor com seletor -->
           <q-field label="Cor" filled stack-label class="q-mb-md">
@@ -94,23 +95,23 @@
                     border: '1px solid #ccc',
                     cursor: 'pointer'
                   }"
-                  @click="abrirSeletorCor = true"
+                  @click.stop="abrirSeletorCor = true"
                 ></div>
                 <span>{{ statusAtual.cor }}</span>
+
+                <!-- Popup com seletor de cor -->
+                <q-popup-proxy v-model="abrirSeletorCor" cover transition-show="scale" transition-hide="scale">
+                  <q-color
+                    v-model="statusAtual.cor"
+                    format-model="hex"
+                    default-view="palette"
+                    bordered
+                    no-header
+                  />
+                </q-popup-proxy>
               </div>
             </template>
           </q-field>
-
-          <!-- Popup com seletor de cor -->
-          <q-popup-proxy v-model="abrirSeletorCor" cover transition-show="scale" transition-hide="scale">
-            <q-color
-              v-model="statusAtual.cor"
-              format-model="hex"
-              default-view="palette"
-              bordered
-              no-header
-            />
-          </q-popup-proxy>
 
           <q-toggle v-model="statusAtual.ativo" label="Ativo" color="green" />
         </q-card-section>
@@ -132,7 +133,7 @@
         <q-separator />
 
         <q-card-section>
-          <div class="q-mb-sm"><strong>Nome:</strong> {{ statusSelecionado?.nome }}</div>
+          <div class="q-mb-sm"><strong>Nome:</strong> {{ statusSelecionado?.descricao }}</div>
           <div class="q-mb-sm flex items-center">
             <strong>Cor:</strong>
             <div
@@ -249,7 +250,6 @@ async function excluirStatus(id) {
   });
 }
 </script>
-
 
 <style scoped>
 .card-rounded {
