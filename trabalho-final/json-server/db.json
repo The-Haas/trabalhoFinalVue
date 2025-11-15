@@ -53,6 +53,15 @@
       "telefone": "(43) 2432",
       "status": false,
       "id": 3
+    },
+    {
+      "id": 4,
+      "razao_social": "teweq",
+      "nome_fantasia": "erqeqr",
+      "cnpj": "34.43",
+      "email": "431314",
+      "telefone": "(43) 413",
+      "status": true
     }
   ],
   "responsaveis": [
@@ -70,6 +79,13 @@
       "telefone": "(32) 342",
       "status": true,
       "ativo": false
+    },
+    {
+      "id": 3,
+      "nome": "new responsável",
+      "email": "42344432",
+      "telefone": "(43) 34242-34",
+      "ativo": true
     }
   ],
   "status_chamados": [
@@ -77,7 +93,7 @@
       "id": 1,
       "descricao": "Aberto",
       "cor": "#28a745",
-      "status": true
+      "ativo": true
     }
   ],
   "departamentos": [
@@ -110,6 +126,14 @@
       "titulo": "testesssteee",
       "dataAbertura": "2025-07-29",
       "departamento": "Financeiro",
+      "status": "Aberto"
+    },
+    {
+      "id": 4,
+      "cliente": "teste",
+      "titulo": "tes",
+      "dataAbertura": "2025-11-15",
+      "departamento": "",
       "status": "Aberto"
     }
   ]

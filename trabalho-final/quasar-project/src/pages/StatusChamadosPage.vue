@@ -158,90 +158,98 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from "vue";
+import { useStatusStore } from "src/stores/statusStore";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
+const store = useStatusStore();
 
 // ===== Estados =====
-const filtro = ref('')
-const modalStatus = ref(false)
-const modalVisualizar = ref(false)
-const modoEdicao = ref(false)
-const abrirSeletorCor = ref(false)
+const filtro = ref("");
+const modalStatus = ref(false);
+const modalVisualizar = ref(false);
+const modoEdicao = ref(false);
+const abrirSeletorCor = ref(false);
 
-// ===== Dados iniciais =====
-const statusChamados = ref([
-  { id: 1, nome: 'Aberto', cor: '#1976D2', ativo: true },
-  { id: 2, nome: 'Em Andamento', cor: '#FFA726', ativo: true },
-  { id: 3, nome: 'Resolvidos', cor: '#000000', ativo: false },
-  { id: 4, nome: 'Fechados', cor: '#4CAF50', ativo: true }
-])
-
-// ===== Colunas =====
-const colunas = [
-  { name: 'id', label: 'Código', field: 'id', align: 'left', sortable: true },
-  { name: 'nome', label: 'Status', field: 'nome', align: 'left', sortable: true },
-  { name: 'cor', label: 'Cor', field: 'cor', align: 'center' },
-  { name: 'ativo', label: 'Status', field: 'ativo', align: 'center' },
-  { name: 'acoes', label: 'Ações', field: 'acoes', align: 'center' }
-]
-
-// ===== Filtro dinâmico =====
-const statusFiltrados = computed(() =>
-  statusChamados.value.filter(s =>
-    s.nome.toLowerCase().includes(filtro.value.toLowerCase())
-  )
-)
-
-// ===== Status atual =====
 const statusAtual = ref({
   id: null,
-  nome: '',
-  cor: '#000000',
+  descricao: "",
+  cor: "#000000",
   ativo: true
-})
+});
 
-const statusSelecionado = ref(null)
+const statusSelecionado = ref(null);
+
+// ===== Tabela (colunas com ícones) =====
+const colunas = [
+  { name: "id", label: "Código", field: "id", align: "left", sortable: true },
+  { name: "descricao", label: "Status", field: "descricao", align: "left", sortable: true },
+  { name: "cor", label: "Cor", field: "cor", align: "center" },
+  { name: "ativo", label: "Ativo", field: "ativo", align: "center" },
+  { name: "acoes", label: "Ações", field: "acoes", align: "center" }
+];
+
+// ===== Carregamento inicial =====
+onMounted(() => {
+  store.listar();
+});
+
+// ===== Filtro da tabela =====
+const statusFiltrados = computed(() =>
+  store.status.filter(s =>
+    s.descricao.toLowerCase().includes(filtro.value.toLowerCase())
+  )
+);
 
 // ===== Funções =====
 function abrirModalNovo() {
-  modoEdicao.value = false
-  statusAtual.value = { id: null, nome: '', cor: '#000000', ativo: true }
-  modalStatus.value = true
+  modoEdicao.value = false;
+  statusAtual.value = { id: null, descricao: "", cor: "#000000", ativo: true };
+  modalStatus.value = true;
 }
 
-function salvarStatus() {
-  if (!statusAtual.value.nome) {
-    alert('O nome do status é obrigatório!')
-    return
+async function salvarStatus() {
+  if (!statusAtual.value.descricao.trim()) {
+    $q.notify({ type: "negative", message: "O nome do status é obrigatório!" });
+    return;
   }
 
   if (modoEdicao.value) {
-    const index = statusChamados.value.findIndex(s => s.id === statusAtual.value.id)
-    if (index !== -1) statusChamados.value[index] = { ...statusAtual.value }
+    await store.atualizar(statusAtual.value.id, statusAtual.value);
+    $q.notify({ type: "positive", message: "Status atualizado!" });
   } else {
-    statusAtual.value.id = statusChamados.value.length + 1
-    statusChamados.value.push({ ...statusAtual.value })
+    await store.criar(statusAtual.value);
+    $q.notify({ type: "positive", message: "Status criado!" });
   }
 
-  modalStatus.value = false
+  modalStatus.value = false;
 }
 
 function visualizarStatus(status) {
-  statusSelecionado.value = status
-  modalVisualizar.value = true
+  statusSelecionado.value = status;
+  modalVisualizar.value = true;
 }
 
 function editarStatus(status) {
-  modoEdicao.value = true
-  statusAtual.value = { ...status }
-  modalStatus.value = true
+  modoEdicao.value = true;
+  statusAtual.value = { ...status };
+  modalStatus.value = true;
 }
 
-function excluirStatus(id) {
-  if (confirm('Tem certeza que deseja excluir este status?')) {
-    statusChamados.value = statusChamados.value.filter(s => s.id !== id)
-  }
+async function excluirStatus(id) {
+  $q.dialog({
+    title: "Confirmar",
+    message: "Deseja realmente excluir este status?",
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    await store.remover(id);
+    $q.notify({ type: "positive", message: "Status removido!" });
+  });
 }
 </script>
+
 
 <style scoped>
 .card-rounded {
