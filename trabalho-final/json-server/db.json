@@ -118,17 +118,10 @@
     },
     {
       "id": 4,
-      "nome": "teste",
-      "email": "teste",
-      "telefone": "",
-      "ativo": true
-    },
-    {
-      "id": 5,
       "nome": "Novo Responsável",
-      "email": "teste@teste.com",
-      "telefone": "",
-      "ativo": true
+      "email": "novoresponsavel@new.com",
+      "telefone": "(23) 23534-6457",
+      "ativo": false
     }
   ],
   "status_chamados": [
@@ -142,7 +135,7 @@
       "id": 2,
       "descricao": "Recusado",
       "cor": "#ff00ff",
-      "ativo": true
+      "ativo": false
     }
   ],
   "departamentos": [

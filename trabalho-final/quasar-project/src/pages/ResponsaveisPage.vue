@@ -141,8 +141,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useResponsaveisStore } from 'src/stores/responsaveisStore'
-import { Notify } from 'quasar'
+import { useQuasar, Notify } from 'quasar'
 
+const $q = useQuasar()
 const store = useResponsaveisStore()
 
 // ===== Estados =====
@@ -182,8 +183,7 @@ const responsavelAtual = ref({
 
 const responsavelSelecionado = ref(null)
 
-// ===== Validação reativa do e-mail (computed) =====
-// Regra: campo vazio => não mostra erro. Só fica inválido se tiver algo e não casar com regex.
+// ===== Validação e-mail =====
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const isEmailInvalid = computed(() => {
   const e = responsavelAtual.value.email
@@ -199,7 +199,6 @@ function abrirModalNovo() {
 }
 
 function limparModal() {
-  // limpa o estado do form quando fecha/cancela
   responsavelAtual.value = { id: null, nome: '', email: '', telefone: '', ativo: true }
   modoEdicao.value = false
 }
@@ -243,14 +242,23 @@ function editarResponsavel(responsavel) {
 }
 
 async function excluirResponsavel(id) {
-  if (!confirm('Tem certeza que deseja excluir este responsável?')) return
-  try {
-    await store.delete(id)
-    Notify.create({ type: 'positive', message: 'Responsável excluído.' })
-  } catch (err) {
-    console.error('Erro excluir responsável:', err)
-    Notify.create({ type: 'negative', message: 'Erro ao excluir responsável.' })
-  }
+  $q.dialog({
+    title: 'Confirmar Exclusão',
+    message: 'Tem certeza que deseja excluir este responsável?',
+    cancel: true,
+    persistent: true,
+    ok: {
+      label: 'Ok'
+    }
+  }).onOk(async () => {
+    try {
+      await store.delete(id)
+      Notify.create({ type: 'positive', message: 'Responsável excluído com sucesso!' })
+    } catch (err) {
+      console.error('Erro excluir responsável:', err)
+      Notify.create({ type: 'negative', message: 'Erro ao excluir responsável.' })
+    }
+  })
 }
 </script>
 
