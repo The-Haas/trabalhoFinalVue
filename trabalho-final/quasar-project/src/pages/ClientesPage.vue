@@ -36,7 +36,7 @@
         dense
         :pagination="{ rowsPerPage: 8 }"
       >
-        <!-- Coluna ativo -->
+        <!-- Status -->
         <template #body-cell-ativo="props">
           <q-td :props="props">
             <q-badge :color="props.row.ativo ? 'green' : 'red'" class="text-white">
@@ -45,7 +45,7 @@
           </q-td>
         </template>
 
-        <!-- Coluna de ações -->
+        <!-- Ações -->
         <template #body-cell-acoes="props">
           <q-td :props="props">
             <q-btn flat round icon="visibility" color="blue" size="sm" @click="visualizarCliente(props.row)" />
@@ -69,13 +69,24 @@
           <q-input v-model="clienteAtual.razaoSocial" label="Razão Social" filled class="q-mb-md" />
           <q-input v-model="clienteAtual.nomeFantasia" label="Nome Fantasia" filled class="q-mb-md" />
           <q-input v-model="clienteAtual.cnpj" label="CNPJ" mask="##.###.###/####-##" filled class="q-mb-md" />
-          <q-input v-model="clienteAtual.email" label="E-mail" type="email" filled class="q-mb-md" />
+
+          <!-- Campo de e-mail com validação reativa -->
+          <q-input
+            v-model="clienteAtual.email"
+            label="E-mail"
+            type="email"
+            filled
+            class="q-mb-md"
+            :error="isEmailInvalid"
+            :error-message="isEmailInvalid ? 'E-mail inválido' : ''"
+          />
+
           <q-input v-model="clienteAtual.telefone" label="Telefone" mask="(##) #####-####" filled class="q-mb-md" />
           <q-toggle v-model="clienteAtual.ativo" label="Ativo" color="green" />
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="grey" v-close-popup />
+          <q-btn flat label="Cancelar" color="grey" v-close-popup @click="limparModal" />
           <q-btn color="orange" label="Salvar" @click="salvarCliente" />
         </q-card-actions>
       </q-card>
@@ -120,7 +131,7 @@ import { useClientesStore } from 'src/stores/clientesStore'
 const $q = useQuasar()
 const store = useClientesStore()
 
-// ===== Bind direto com o store =====
+// Bind direto com store
 const filtro = computed({
   get: () => store.filtro,
   set: (v) => (store.filtro = v)
@@ -128,7 +139,7 @@ const filtro = computed({
 
 const clientesFiltrados = computed(() => store.clientesFiltrados)
 
-// ===== Colunas da tabela =====
+// Colunas
 const colunas = [
   { name: 'razaoSocial', label: 'Razão Social', field: 'razaoSocial', align: 'left', sortable: true },
   { name: 'nomeFantasia', label: 'Nome Fantasia', field: 'nomeFantasia', align: 'left', sortable: true },
@@ -139,7 +150,7 @@ const colunas = [
   { name: 'acoes', label: 'Ações', field: 'acoes', align: 'center' }
 ]
 
-// ===== Modais =====
+// Modais e dados
 const modalCliente = ref(false)
 const modalVisualizar = ref(false)
 const modoEdicao = ref(false)
@@ -156,11 +167,20 @@ const clienteAtual = ref({
 
 const clienteSelecionado = ref(null)
 
+// Validação de E-mail (computed reativo)
+// regra: campo vazio => válido (não fica vermelho). Só valida quando usuário digitou algo.
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const isEmailInvalid = computed(() => {
+  const e = clienteAtual.value.email
+  if (!e || e.trim() === '') return false // vazio => não inválido (não mostrar erro)
+  return !emailRegex.test(e)
+})
+
 onMounted(() => {
   store.carregarClientes()
 })
 
-// ===== Abrir modal novo =====
+// Abrir modal novo
 function abrirModalNovoCliente() {
   modoEdicao.value = false
   clienteAtual.value = {
@@ -175,55 +195,64 @@ function abrirModalNovoCliente() {
   modalCliente.value = true
 }
 
-// ===== Salvar (criar ou editar) =====
+// Limpa dados ao cancelar (opcional, evita estado persistente)
+function limparModal() {
+  // só limpa quando modal fechado
+  // não fecha manualmente aqui, o v-close-popup já fecha
+  clienteAtual.value = {
+    id: null,
+    razaoSocial: '',
+    nomeFantasia: '',
+    cnpj: '',
+    email: '',
+    telefone: '',
+    ativo: true
+  }
+  modoEdicao.value = false
+}
+
+// Salvar (criar ou editar)
 async function salvarCliente() {
   if (!clienteAtual.value.razaoSocial || !clienteAtual.value.nomeFantasia) {
-    $q.notify({
-      type: 'warning',
-      message: 'Preencha os campos obrigatórios!'
-    })
+    $q.notify({ type: 'warning', message: 'Preencha os campos obrigatórios!' })
+    return
+  }
+
+  if (isEmailInvalid.value) {
+    $q.notify({ type: 'warning', message: 'Informe um e-mail válido!' })
     return
   }
 
   try {
     if (modoEdicao.value) {
       await store.atualizarCliente(clienteAtual.value)
-      $q.notify({
-        type: 'positive',
-        message: 'Cliente atualizado com sucesso!'
-      })
+      $q.notify({ type: 'positive', message: 'Cliente atualizado com sucesso!' })
     } else {
       await store.criarCliente(clienteAtual.value)
-      $q.notify({
-        type: 'positive',
-        message: 'Cliente criado com sucesso!'
-      })
+      $q.notify({ type: 'positive', message: 'Cliente criado com sucesso!' })
     }
-
     modalCliente.value = false
   } catch (error) {
     console.error('Erro ao salvar cliente:', error)
-    $q.notify({
-      type: 'negative',
-      message: 'Erro ao salvar cliente!'
-    })
+    $q.notify({ type: 'negative', message: 'Erro ao salvar cliente!' })
   }
 }
 
-// ===== Visualizar =====
+// Visualizar
 function visualizarCliente(c) {
   clienteSelecionado.value = c
   modalVisualizar.value = true
 }
 
-// ===== Editar =====
+// Editar
 function editarCliente(c) {
   modoEdicao.value = true
-  clienteAtual.value = { ...c }
+  clienteAtual.value = { ...c } // copia para evitar duas-way binding com a fonte original
+  // não precisamos chamar validar; computed reavalia automaticamente
   modalCliente.value = true
 }
 
-// ===== Excluir =====
+// Excluir
 async function excluirCliente(id) {
   $q.dialog({
     title: 'Confirmar Exclusão',
@@ -233,21 +262,14 @@ async function excluirCliente(id) {
   }).onOk(async () => {
     try {
       await store.excluirCliente(id)
-      $q.notify({
-        type: 'positive',
-        message: 'Cliente excluído com sucesso!'
-      })
+      $q.notify({ type: 'positive', message: 'Cliente excluído com sucesso!' })
     } catch (error) {
       console.error('Erro ao excluir cliente:', error)
-      $q.notify({
-        type: 'negative',
-        message: 'Erro ao excluir cliente.'
-      })
+      $q.notify({ type: 'negative', message: 'Erro ao excluir cliente.' })
     }
   })
 }
 </script>
-
 
 <style scoped>
 .card-rounded {

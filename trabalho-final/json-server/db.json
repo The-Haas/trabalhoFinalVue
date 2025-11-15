@@ -81,6 +81,24 @@
       "email": "",
       "telefone": "",
       "status": true
+    },
+    {
+      "id": 6,
+      "razao_social": "teste",
+      "nome_fantasia": "teste",
+      "cnpj": "23.432.454/35",
+      "email": "teste",
+      "telefone": "(32) 4324",
+      "status": true
+    },
+    {
+      "id": 7,
+      "razao_social": "testeeee",
+      "nome_fantasia": "teste",
+      "cnpj": "23.432.434/4233-41",
+      "email": "teste@teste.com",
+      "telefone": "(23) 42352-3543",
+      "status": true
     }
   ],
   "responsaveis": [
