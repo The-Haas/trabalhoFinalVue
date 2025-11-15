@@ -100,7 +100,12 @@
     {
       "id": 1,
       "nome": "Suporte Técnico",
-      "status": true
+      "ativo": true
+    },
+    {
+      "id": 2,
+      "nome": "Financeiro",
+      "ativo": true
     }
   ],
   "chamados": [

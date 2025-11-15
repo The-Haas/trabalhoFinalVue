@@ -106,7 +106,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useDepartamentosStore } from 'src/stores/departamentosStore'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+const store = useDepartamentosStore()
 
 // ===== Estados =====
 const filtro = ref('')
@@ -114,30 +119,6 @@ const modalDepartamento = ref(false)
 const modalVisualizar = ref(false)
 const modoEdicao = ref(false)
 
-// ===== Dados iniciais =====
-const departamentos = ref([
-  { id: 1, nome: 'Suporte', ativo: true },
-  { id: 2, nome: 'Financeiro', ativo: true },
-  { id: 3, nome: 'Infraestrutura', ativo: false },
-  { id: 4, nome: 'Desenvolvimento', ativo: true }
-])
-
-// ===== Colunas =====
-const colunas = [
-  { name: 'id', label: 'Código', field: 'id', align: 'left', sortable: true },
-  { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
-  { name: 'ativo', label: 'Status', field: 'ativo', align: 'center' },
-  { name: 'acoes', label: 'Ações', field: 'acoes', align: 'center' }
-]
-
-// ===== Filtro dinâmico =====
-const departamentosFiltrados = computed(() =>
-  departamentos.value.filter(d =>
-    d.nome.toLowerCase().includes(filtro.value.toLowerCase())
-  )
-)
-
-// ===== Departamento atual =====
 const departamentoAtual = ref({
   id: null,
   nome: '',
@@ -146,6 +127,26 @@ const departamentoAtual = ref({
 
 const departamentoSelecionado = ref(null)
 
+// ===== Colunas da tabela =====
+const colunas = [
+  { name: 'id', label: 'Código', field: 'id', align: 'left', sortable: true },
+  { name: 'nome', label: 'Nome', field: 'nome', align: 'left', sortable: true },
+  { name: 'ativo', label: 'Status', field: 'ativo', align: 'center' },
+  { name: 'acoes', label: 'Ações', field: 'acoes', align: 'center' }
+]
+
+// ===== Computed para filtro =====
+const departamentosFiltrados = computed(() =>
+  store.departamentos.filter(d =>
+    d.nome.toLowerCase().includes(filtro.value.toLowerCase())
+  )
+)
+
+// ===== Carregar departamentos ao montar =====
+onMounted(() => {
+  store.listar()
+})
+
 // ===== Funções =====
 function abrirModalNovo() {
   modoEdicao.value = false
@@ -153,18 +154,18 @@ function abrirModalNovo() {
   modalDepartamento.value = true
 }
 
-function salvarDepartamento() {
-  if (!departamentoAtual.value.nome) {
-    alert('O nome do departamento é obrigatório!')
+async function salvarDepartamento() {
+  if (!departamentoAtual.value.nome.trim()) {
+    $q.notify({ type: 'negative', message: 'O nome do departamento é obrigatório!' })
     return
   }
 
   if (modoEdicao.value) {
-    const index = departamentos.value.findIndex(d => d.id === departamentoAtual.value.id)
-    if (index !== -1) departamentos.value[index] = { ...departamentoAtual.value }
+    await store.atualizar(departamentoAtual.value.id, departamentoAtual.value)
+    $q.notify({ type: 'positive', message: 'Departamento atualizado!' })
   } else {
-    departamentoAtual.value.id = departamentos.value.length + 1
-    departamentos.value.push({ ...departamentoAtual.value })
+    await store.criar(departamentoAtual.value)
+    $q.notify({ type: 'positive', message: 'Departamento criado!' })
   }
 
   modalDepartamento.value = false
@@ -181,12 +182,19 @@ function editarDepartamento(departamento) {
   modalDepartamento.value = true
 }
 
-function excluirDepartamento(id) {
-  if (confirm('Tem certeza que deseja excluir este departamento?')) {
-    departamentos.value = departamentos.value.filter(d => d.id !== id)
-  }
+async function excluirDepartamento(id) {
+  $q.dialog({
+    title: 'Confirmar',
+    message: 'Deseja realmente excluir este departamento?',
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    await store.remover(id)
+    $q.notify({ type: 'positive', message: 'Departamento removido!' })
+  })
 }
 </script>
+
 
 <style scoped>
 .card-rounded {
