@@ -24,6 +24,16 @@
       "id": 5,
       "email": "admin",
       "senha": "admin"
+    },
+    {
+      "id": 6,
+      "email": "teste",
+      "senha": "teste"
+    },
+    {
+      "id": 7,
+      "email": "igor@igor.com",
+      "senha": "teste123@A"
     }
   ],
   "clientes": [
@@ -61,6 +71,15 @@
       "cnpj": "34.43",
       "email": "431314",
       "telefone": "(43) 413",
+      "status": true
+    },
+    {
+      "id": 5,
+      "razao_social": "teste",
+      "nome_fantasia": "teste",
+      "cnpj": "",
+      "email": "",
+      "telefone": "",
       "status": true
     }
   ],
@@ -151,6 +170,22 @@
       "dataAbertura": "2025-11-07",
       "departamento": "Desenvolvimento",
       "status": "Em Andamento"
+    },
+    {
+      "id": 7,
+      "cliente": "teste",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-15",
+      "departamento": "Financeiro",
+      "status": "Aberto"
+    },
+    {
+      "id": 8,
+      "cliente": "teste",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-15",
+      "departamento": "",
+      "status": "Aberto"
     }
   ]
 }

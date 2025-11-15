@@ -11,29 +11,48 @@
           label="Email"
           type="email"
           class="q-mb-sm"
+          :error="email !== '' && !emailValido"
+          :error-message="email !== '' && !emailValido ? emailErro : ''"
         />
 
         <!-- Senha -->
         <q-input
           filled
           v-model="senha"
+          :type="mostrarSenha ? 'text' : 'password'"
           label="Senha"
-          type="password"
-          :toggle-password="true"
           class="q-mb-sm"
-        />
+          :error="senha !== '' && !senhaValida"
+          :error-message="senha !== '' && !senhaValida ? senhaErro : ''"
+        >
+          <template #append>
+            <q-icon
+              :name="mostrarSenha ? 'visibility' : 'visibility_off'"
+              class="cursor-pointer"
+              @click="mostrarSenha = !mostrarSenha"
+            />
+          </template>
+        </q-input>
 
         <!-- Confirmar Senha -->
         <q-input
           filled
           v-model="confirmarSenha"
+          :type="mostrarConfirmar ? 'text' : 'password'"
           label="Confirmar Senha"
-          type="password"
-          :toggle-password="true"
           class="q-mb-md"
-        />
+          :error="confirmarSenha !== '' && confirmarSenha !== senha"
+          :error-message="confirmarSenha !== '' && confirmarSenha !== senha ? 'A confirmação deve ser igual à senha.' : ''"
+        >
+          <template #append>
+            <q-icon
+              :name="mostrarConfirmar ? 'visibility' : 'visibility_off'"
+              class="cursor-pointer"
+              @click="mostrarConfirmar = !mostrarConfirmar"
+            />
+          </template>
+        </q-input>
 
-        <!-- Botão Cadastrar -->
         <q-btn
           label="Cadastrar-se"
           color="orange"
@@ -61,24 +80,55 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRegisterStore } from 'src/stores/registerStore'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 
+// Inputs
 const email = ref('')
 const senha = ref('')
 const confirmarSenha = ref('')
 
+// Toggle de mostrar senha (olhinho)
+const mostrarSenha = ref(false)
+const mostrarConfirmar = ref(false)
+
 const router = useRouter()
 const $q = useQuasar()
 const registerStore = useRegisterStore()
+
+// ===== REGEX =====
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const senhaRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
+
+// ===== Validações =====
+const emailValido = computed(() => emailRegex.test(email.value))
+const senhaValida = computed(() => senhaRegex.test(senha.value))
+
+const emailErro = 'Informe um email válido.'
+const senhaErro =
+  'A senha deve ter no mínimo 8 caracteres, incluindo 1 letra maiúscula, 1 número e 1 caractere especial.'
 
 async function cadastrar() {
   if (!email.value || !senha.value || !confirmarSenha.value) {
     return $q.notify({
       type: 'warning',
       message: 'Preencha todos os campos!'
+    })
+  }
+
+  if (!emailValido.value) {
+    return $q.notify({
+      type: 'negative',
+      message: 'Informe um email válido!'
+    })
+  }
+
+  if (!senhaValida.value) {
+    return $q.notify({
+      type: 'negative',
+      message: senhaErro
     })
   }
 
@@ -101,20 +151,18 @@ async function cadastrar() {
     })
   }
 
-
-$q.notify({
-  type: 'positive',
-  message: 'Cadastro realizado com sucesso!',
-  caption: 'Você já pode fazer login.',
-  icon: 'check_circle',
-  timeout: 2500,
-  position: 'top'
-})
+  $q.notify({
+    type: 'positive',
+    message: 'Cadastro realizado com sucesso!',
+    caption: 'Você já pode fazer login.',
+    icon: 'check_circle',
+    timeout: 2500,
+    position: 'top'
+  })
 
   router.push('/login')
 }
 </script>
-
 
 <style scoped>
 a {
