@@ -73,14 +73,6 @@
       "ativo": true
     },
     {
-      "id": 2,
-      "nome": "teste",
-      "email": "te",
-      "telefone": "(32) 342",
-      "status": true,
-      "ativo": false
-    },
-    {
       "id": 3,
       "nome": "new responsável",
       "email": "42344432",
@@ -113,8 +105,8 @@
       "id": 1,
       "cliente": "Horus Faculdades",
       "titulo": "Problema no sistema de login",
-      "dataAbertura": "25-10-2024",
-      "departamento": "suporte",
+      "dataAbertura": "2025-11-15",
+      "departamento": "Suporte",
       "status": "Em Andamento"
     },
     {
@@ -126,19 +118,19 @@
       "status": "Fechado"
     },
     {
-      "id": 3,
-      "cliente": "teesteee",
-      "titulo": "testesssteee",
-      "dataAbertura": "2025-07-29",
-      "departamento": "Financeiro",
-      "status": "Aberto"
-    },
-    {
       "id": 4,
       "cliente": "teste",
       "titulo": "tes",
       "dataAbertura": "2025-11-15",
-      "departamento": "",
+      "departamento": "Suporte",
+      "status": "Aberto"
+    },
+    {
+      "id": 5,
+      "cliente": "Teste 1",
+      "titulo": "teste",
+      "dataAbertura": "2025-11-15",
+      "departamento": "Desenvolvimento",
       "status": "Aberto"
     }
   ]

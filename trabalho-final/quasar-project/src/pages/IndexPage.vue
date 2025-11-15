@@ -1,9 +1,38 @@
 <template>
   <q-page class="q-pa-lg bg-grey-2 q-gutter-y-lg">
 
-    <!-- ===== Título ===== -->
-    <div>
-      <h5 class="text-h5 text-weight-bold">Painel de Controle</h5>
+    <!-- ===== Título e Filtro de Datas ===== -->
+    <div class="row items-center q-mb-md q-gutter-sm">
+      <div class="col">
+        <h5 class="text-h5 text-weight-bold">Painel de Controle</h5>
+      </div>
+
+      <!-- Campos de Data -->
+      <div class="col-auto">
+        <q-input
+          filled
+          v-model="dataInicial"
+          type="date"
+          label="Data Inicial"
+          dense
+          class="q-mr-sm"
+        />
+      </div>
+      <div class="col-auto">
+        <q-input
+          filled
+          v-model="dataFinal"
+          type="date"
+          label="Data Final"
+          dense
+          class="q-mr-sm"
+        />
+      </div>
+
+      <!-- Botão OK -->
+      <div class="col-auto">
+        <q-btn color="orange" label="OK" @click="atualizarDashboard" />
+      </div>
     </div>
 
     <!-- ===== Cards principais ===== -->
@@ -13,8 +42,8 @@
         <q-card class="card-metric q-pa-md">
           <q-card-section>
             <div class="text-subtitle2 text-grey-7">Chamados Abertos</div>
-            <div class="text-h5 text-weight-bold text-orange">50</div>
-            <div class="text-caption text-grey">Nesta Semana</div>
+            <div class="text-h5 text-weight-bold text-orange">{{ qtdChamados('Aberto') }}</div>
+            <div class="text-caption text-grey">No período</div>
           </q-card-section>
         </q-card>
       </div>
@@ -23,8 +52,8 @@
         <q-card class="card-metric q-pa-md">
           <q-card-section>
             <div class="text-subtitle2 text-grey-7">Chamados Fechados</div>
-            <div class="text-h5 text-weight-bold text-green">100</div>
-            <div class="text-caption text-grey">Nesta Semana</div>
+            <div class="text-h5 text-weight-bold text-green">{{ qtdChamados('Fechado') }}</div>
+            <div class="text-caption text-grey">No período</div>
           </q-card-section>
         </q-card>
       </div>
@@ -33,8 +62,8 @@
         <q-card class="card-metric q-pa-md">
           <q-card-section>
             <div class="text-subtitle2 text-grey-7">Total de Chamados</div>
-            <div class="text-h5 text-weight-bold text-blue">150</div>
-            <div class="text-caption text-grey">Nesta Semana</div>
+            <div class="text-h5 text-weight-bold text-blue">{{ chamados.length }}</div>
+            <div class="text-caption text-grey">No período</div>
           </q-card-section>
         </q-card>
       </div>
@@ -57,7 +86,7 @@
               <div>{{ item.qtd }}</div>
             </div>
             <q-linear-progress
-              :value="item.qtd / 100"
+              :value="item.qtd / totalChamados"
               :color="item.cor"
               track-color="grey-3"
               rounded
@@ -76,14 +105,14 @@
 
           <q-circular-progress
             show-value
-            :value="50"
+            :value="percentualFechados"
             size="140px"
             color="orange"
             class="q-mb-md"
           >
-            50%
+            {{ percentualFechados }}%
           </q-circular-progress>
-          <div class="text-grey-7 text-caption">Concluídos nesta semana</div>
+          <div class="text-grey-7 text-caption">Concluídos no período</div>
         </q-card>
       </div>
 
@@ -96,13 +125,13 @@
         <q-card class="q-pa-lg card-rounded">
           <div class="text-subtitle1 text-weight-bold q-mb-md flex items-center">
             <q-icon name="star" class="q-mr-sm text-orange" size="20px" />
-            Ranking Responsáveis
+            Ranking Clientes
           </div>
 
           <q-markup-table flat bordered>
             <thead>
               <tr>
-                <th>Responsável</th>
+                <th>Cliente</th>
                 <th class="text-right">Chamados</th>
               </tr>
             </thead>
@@ -129,7 +158,7 @@
               <div>{{ dep.qtd }}</div>
             </div>
             <q-linear-progress
-              :value="dep.qtd / 100"
+              :value="dep.qtd / totalChamados"
               :color="dep.cor"
               track-color="grey-3"
               rounded
@@ -145,30 +174,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useIndexStore } from '../stores/indexStore'
 
-const chamadosStatus = ref([
-  { nome: 'Abertos', qtd: 50, cor: 'orange' },
-  { nome: 'Em Andamento', qtd: 50, cor: 'amber' },
-  { nome: 'Fechados', qtd: 100, cor: 'green' }
-])
+const indexStore = useIndexStore()
 
-const ranking = ref([
-  { nome: 'Felipe Damo', chamados: 30 },
-  { nome: 'Bruno Bareta', chamados: 29 },
-  { nome: 'Bruno Balen', chamados: 28 },
-  { nome: 'Budacir', chamados: 25 },
-  { nome: 'Jorge Trento', chamados: 23 },
-  { nome: 'Jov', chamados: 20 },
-  { nome: 'Mariano', chamados: 18 },
-  { nome: 'Rambo', chamados: 15 }
-])
+// Campos de data
+const dataInicial = ref('')
+const dataFinal = ref('')
 
-const departamentos = ref([
-  { nome: 'Financeiro', qtd: 50, cor: 'blue' },
-  { nome: 'Suporte', qtd: 100, cor: 'orange' },
-  { nome: 'Desenvolvimento', qtd: 30, cor: 'green' }
-])
+// Quando carregar a página, pré-seleciona o mês atual
+onMounted(async () => {
+  const hoje = new Date()
+  const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
+  const formatarData = (date) => date.toISOString().split('T')[0]
+
+  dataInicial.value = formatarData(primeiroDia)
+  dataFinal.value = formatarData(hoje)
+
+  await indexStore.buscarChamados(dataInicial.value, dataFinal.value)
+})
+
+// Atualiza os widgets ao clicar em OK
+const atualizarDashboard = async () => {
+  await indexStore.buscarChamados(dataInicial.value, dataFinal.value)
+}
+
+// Computeds para facilitar
+const chamados = computed(() => indexStore.chamados)
+const chamadosStatus = computed(() => indexStore.chamadosStatus)
+const ranking = computed(() => indexStore.ranking)
+const departamentos = computed(() => indexStore.departamentos)
+const totalChamados = computed(() => chamados.value.length)
+const percentualFechados = computed(() => {
+  if (!totalChamados.value) return 0
+  const fechados = chamadosStatus.value.find(s => s.nome === 'Fechado')
+  return fechados ? Math.round((fechados.qtd / totalChamados.value) * 100) : 0
+})
+
+// Função auxiliar
+const qtdChamados = (status) => {
+  const s = chamadosStatus.value.find(s => s.nome === status)
+  return s ? s.qtd : 0
+}
 </script>
 
 <style scoped>
