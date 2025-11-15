@@ -44,6 +44,15 @@
       "email": "teste@#teste",
       "telefone": "(32) 44356-4567",
       "status": true
+    },
+    {
+      "razao_social": "teste",
+      "nome_fantasia": "teste",
+      "cnpj": "32.434.2",
+      "email": "43432",
+      "telefone": "(43) 2432",
+      "status": false,
+      "id": 3
     }
   ],
   "responsaveis": [
@@ -52,7 +61,15 @@
       "nome": "Ricardo Silva",
       "email": "ricardo@ricardo.com",
       "telefone": "(49) 91234-5678",
-      "status": true
+      "ativo": true
+    },
+    {
+      "id": 2,
+      "nome": "teste",
+      "email": "te",
+      "telefone": "(32) 342",
+      "status": true,
+      "ativo": false
     }
   ],
   "status_chamados": [
