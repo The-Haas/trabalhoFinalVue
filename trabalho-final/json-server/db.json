@@ -19,6 +19,11 @@
       "id": 4,
       "email": "igor",
       "senha": "igor"
+    },
+    {
+      "id": 5,
+      "email": "admin",
+      "senha": "admin"
     }
   ],
   "clientes": [
@@ -38,15 +43,6 @@
       "cnpj": "23.434.545/6456-65",
       "email": "teste@#teste",
       "telefone": "(32) 44356-4567",
-      "status": true
-    },
-    {
-      "id": 3,
-      "razao_social": "treteasr",
-      "nome_fantasia": "twWgf",
-      "cnpj": "44.637.542/7476-74",
-      "email": "6341354513244636",
-      "telefone": "(43) 65453-4532",
       "status": true
     }
   ],
@@ -88,23 +84,15 @@
       "cliente": "teste",
       "titulo": "teste",
       "dataAbertura": "2025-11-14",
-      "departamento": "",
-      "status": "Aberto"
+      "departamento": "Financeiro",
+      "status": "Fechado"
     },
     {
       "id": 3,
-      "cliente": "tee",
-      "titulo": "teste",
-      "dataAbertura": "2025-11-14",
+      "cliente": "teesteee",
+      "titulo": "testesssteee",
+      "dataAbertura": "2025-07-29",
       "departamento": "Financeiro",
-      "status": "Aberto"
-    },
-    {
-      "id": 4,
-      "cliente": "teste10",
-      "titulo": "teste10",
-      "dataAbertura": "2025-11-15",
-      "departamento": "",
       "status": "Aberto"
     }
   ]

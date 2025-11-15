@@ -113,40 +113,37 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useQuasar } from 'quasar'
+import { useClientesStore } from 'src/stores/clientesStore'
 
-// ===== Dados e estados =====
-const filtro = ref('')
-const modalCliente = ref(false)
-const modalVisualizar = ref(false)
-const modoEdicao = ref(false)
+const $q = useQuasar()
+const store = useClientesStore()
 
-const clientes = ref([
-  { id: 1, razaoSocial: 'Horus Faculdades e Sistemas', nomeFantasia: 'Instituição de Ensino Superior', cnpj: '99.999.999/0009-99', email: 'contato@horus.com', telefone: '(49) 99999-9999', ativo: true },
-  { id: 2, razaoSocial: 'BM Estética Automotiva', nomeFantasia: 'BM Car', cnpj: '11.222.333/0001-44', email: 'contato@bmcar.com', telefone: '(49) 98888-8888', ativo: false },
-  { id: 3, razaoSocial: 'Mariano Sistemas', nomeFantasia: 'Mariano', cnpj: '55.444.333/0001-77', email: 'suporte@Mariano.com', telefone: '(49) 97777-7777', ativo: true }
-])
+// ===== Bind direto com o store =====
+const filtro = computed({
+  get: () => store.filtro,
+  set: (v) => (store.filtro = v)
+})
 
-// ===== Colunas =====
+const clientesFiltrados = computed(() => store.clientesFiltrados)
+
+// ===== Colunas da tabela =====
 const colunas = [
-  { name: 'id', label: 'Código', field: 'id', align: 'left', sortable: true },
   { name: 'razaoSocial', label: 'Razão Social', field: 'razaoSocial', align: 'left', sortable: true },
   { name: 'nomeFantasia', label: 'Nome Fantasia', field: 'nomeFantasia', align: 'left', sortable: true },
-  { name: 'cnpj', label: 'CNPJ', field: 'cnpj', align: 'center', sortable: true },
+  { name: 'cnpj', label: 'CNPJ', field: 'cnpj', align: 'left', sortable: true },
+  { name: 'email', label: 'E-mail', field: 'email', align: 'left' },
+  { name: 'telefone', label: 'Telefone', field: 'telefone', align: 'left' },
   { name: 'ativo', label: 'Status', field: 'ativo', align: 'center' },
   { name: 'acoes', label: 'Ações', field: 'acoes', align: 'center' }
 ]
 
-// ===== Filtro dinâmico =====
-const clientesFiltrados = computed(() =>
-  clientes.value.filter(c =>
-    c.razaoSocial.toLowerCase().includes(filtro.value.toLowerCase()) ||
-    c.nomeFantasia.toLowerCase().includes(filtro.value.toLowerCase()) ||
-    c.cnpj.includes(filtro.value)
-  )
-)
+// ===== Modais =====
+const modalCliente = ref(false)
+const modalVisualizar = ref(false)
+const modoEdicao = ref(false)
 
-// ===== Cliente atual =====
 const clienteAtual = ref({
   id: null,
   razaoSocial: '',
@@ -159,7 +156,11 @@ const clienteAtual = ref({
 
 const clienteSelecionado = ref(null)
 
-// ===== Funções principais =====
+onMounted(() => {
+  store.carregarClientes()
+})
+
+// ===== Abrir modal novo =====
 function abrirModalNovoCliente() {
   modoEdicao.value = false
   clienteAtual.value = {
@@ -174,40 +175,79 @@ function abrirModalNovoCliente() {
   modalCliente.value = true
 }
 
-function salvarCliente() {
+// ===== Salvar (criar ou editar) =====
+async function salvarCliente() {
   if (!clienteAtual.value.razaoSocial || !clienteAtual.value.nomeFantasia) {
-    alert('Preencha os campos obrigatórios!')
+    $q.notify({
+      type: 'warning',
+      message: 'Preencha os campos obrigatórios!'
+    })
     return
   }
 
-  if (modoEdicao.value) {
-    const index = clientes.value.findIndex(c => c.id === clienteAtual.value.id)
-    if (index !== -1) clientes.value[index] = { ...clienteAtual.value }
-  } else {
-    clienteAtual.value.id = clientes.value.length + 1
-    clientes.value.push({ ...clienteAtual.value })
-  }
+  try {
+    if (modoEdicao.value) {
+      await store.atualizarCliente(clienteAtual.value)
+      $q.notify({
+        type: 'positive',
+        message: 'Cliente atualizado com sucesso!'
+      })
+    } else {
+      await store.criarCliente(clienteAtual.value)
+      $q.notify({
+        type: 'positive',
+        message: 'Cliente criado com sucesso!'
+      })
+    }
 
-  modalCliente.value = false
+    modalCliente.value = false
+  } catch (error) {
+    console.error('Erro ao salvar cliente:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao salvar cliente!'
+    })
+  }
 }
 
-function visualizarCliente(cliente) {
-  clienteSelecionado.value = cliente
+// ===== Visualizar =====
+function visualizarCliente(c) {
+  clienteSelecionado.value = c
   modalVisualizar.value = true
 }
 
-function editarCliente(cliente) {
+// ===== Editar =====
+function editarCliente(c) {
   modoEdicao.value = true
-  clienteAtual.value = { ...cliente }
+  clienteAtual.value = { ...c }
   modalCliente.value = true
 }
 
-function excluirCliente(id) {
-  if (confirm('Tem certeza que deseja excluir este cliente?')) {
-    clientes.value = clientes.value.filter(c => c.id !== id)
-  }
+// ===== Excluir =====
+async function excluirCliente(id) {
+  $q.dialog({
+    title: 'Confirmar Exclusão',
+    message: 'Tem certeza que deseja excluir este cliente?',
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    try {
+      await store.excluirCliente(id)
+      $q.notify({
+        type: 'positive',
+        message: 'Cliente excluído com sucesso!'
+      })
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error)
+      $q.notify({
+        type: 'negative',
+        message: 'Erro ao excluir cliente.'
+      })
+    }
+  })
 }
 </script>
+
 
 <style scoped>
 .card-rounded {
