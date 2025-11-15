@@ -20,16 +20,8 @@
 
     <!-- ===== Tabela ===== -->
     <q-card class="q-pa-none card-rounded">
-      <q-table
-        title="Lista de Chamados"
-        :rows="chamadosFiltrados"
-        :columns="colunas"
-        row-key="id"
-        flat
-        bordered
-        dense
-        :pagination="{ rowsPerPage: 8 }"
-      >
+      <q-table title="Lista de Chamados" :rows="chamadosFiltrados" :columns="colunas" row-key="id" flat bordered dense
+        :pagination="{ rowsPerPage: 8 }">
         <!-- Coluna de status -->
         <template #body-cell-status="props">
           <q-td :props="props">
@@ -63,19 +55,10 @@
           <q-input v-model="chamadoAtual.cliente" label="Cliente" filled class="q-mb-md" />
           <q-input v-model="chamadoAtual.titulo" label="Título" filled class="q-mb-md" />
           <q-input v-model="chamadoAtual.dataAbertura" label="Data de Abertura" type="date" filled class="q-mb-md" />
-          <q-select
-            v-model="chamadoAtual.departamento"
-            label="Departamento"
-            filled
-            :options="['Suporte', 'Financeiro', 'Desenvolvimento']"
-            class="q-mb-md"
-          />
-          <q-select
-            v-model="chamadoAtual.status"
-            label="Status"
-            filled
-            :options="['Aberto', 'Em Andamento', 'Fechado']"
-          />
+          <q-select v-model="chamadoAtual.departamento" label="Departamento" filled
+            :options="['Suporte', 'Financeiro', 'Desenvolvimento']" class="q-mb-md" />
+          <q-select v-model="chamadoAtual.status" label="Status" filled
+            :options="['Aberto', 'Em Andamento', 'Fechado']" />
         </q-card-section>
 
         <q-card-actions align="right">
@@ -116,40 +99,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
+import { useChamadosStore } from 'src/stores/chamadosStore'
 
-// ===== Dados e estados =====
+// ===== Quasar e Store =====
+const $q = useQuasar()
+const store = useChamadosStore()
+
+// ===== Estados dos modais =====
 const filtro = ref('')
 const modalChamado = ref(false)
 const modalVisualizar = ref(false)
 const modoEdicao = ref(false)
 
-const chamados = ref([  
-  {
-    id: 1,
-    cliente: 'Mariano Sistemas',
-    titulo: 'Erro no login do sistema',
-    dataAbertura: '2025-10-25',
-    departamento: 'Suporte',
-    status: 'Aberto'
-  },
-  {
-    id: 2,
-    cliente: 'BM Estética Automotiva',
-    titulo: 'Atualização pendente no módulo financeiro',
-    dataAbertura: '2025-10-28',
-    departamento: 'Desenvolvimento',
-    status: 'Em Andamento'
-  },
-  {
-    id: 3,
-    cliente: 'Horus Faculdade',
-    titulo: 'Solicitação de melhoria no painel',
-    dataAbertura: '2025-10-20',
-    departamento: 'Financeiro',
-    status: 'Fechado'
-  }
-])
+// ===== Carregar chamados ao abrir a página =====
+onMounted(() => {
+  store.carregarChamados()
+})
+
+// ===== Chamados do backend =====
+const chamados = computed(() => store.lista)
 
 // ===== Colunas =====
 const colunas = [
@@ -182,7 +152,9 @@ const chamadoAtual = ref({
 
 const chamadoSelecionado = ref(null)
 
-// ===== Funções principais =====
+// ===== Funções =====
+
+// Novo chamado
 function abrirModalNovoChamado() {
   modoEdicao.value = false
   chamadoAtual.value = {
@@ -196,40 +168,74 @@ function abrirModalNovoChamado() {
   modalChamado.value = true
 }
 
-function salvarChamado() {
+// Criar ou editar chamado (JSON Server)
+async function salvarChamado() {
   if (!chamadoAtual.value.cliente || !chamadoAtual.value.titulo) {
-    alert('Preencha todos os campos obrigatórios!')
-    return
+    return $q.notify({
+      type: 'warning',
+      message: 'Preencha todos os campos obrigatórios!'
+    })
   }
 
-  if (modoEdicao.value) {
-    const index = chamados.value.findIndex(c => c.id === chamadoAtual.value.id)
-    if (index !== -1) chamados.value[index] = { ...chamadoAtual.value }
-  } else {
-    chamadoAtual.value.id = chamados.value.length + 1
-    chamados.value.push({ ...chamadoAtual.value })
-  }
+    if (modoEdicao.value) {
+      await store.editarChamado({ ...chamadoAtual.value })
+      $q.notify({ type: 'positive', message: 'Chamado atualizado!' })
+    } else {
+      await store.criarChamado({ ...chamadoAtual.value })
+      $q.notify({ type: 'positive', message: 'Chamado criado com sucesso!' })
+    }
 
-  modalChamado.value = false
+    modalChamado.value = false
+
 }
 
+// Visualizar chamado
 function visualizarChamado(chamado) {
   chamadoSelecionado.value = chamado
   modalVisualizar.value = true
 }
 
+// Editar chamado
 function editarChamado(chamado) {
   modoEdicao.value = true
   chamadoAtual.value = { ...chamado }
   modalChamado.value = true
 }
 
-function excluirChamado(id) {
-  if (confirm('Tem certeza que deseja excluir este chamado?')) {
-    chamados.value = chamados.value.filter(c => c.id !== id)
-  }
+// Excluir chamado — versão robusta com logs e tratamento
+async function excluirChamado(id) {
+  console.log('[UI] excluirChamado chamado com id:', id, 'tipo:', typeof id)
+
+  // cheque rápido no array local antes de abrir o dialog
+  const existeLocal = store.lista.some(c => Number(c.id) === Number(id))
+  console.log('[UI] existeLocal?', existeLocal)
+
+  $q.dialog({
+    title: 'Excluir Chamado',
+    message: 'Tem certeza que deseja excluir este chamado?',
+    cancel: true,
+    persistent: true
+  }).onOk(async () => {
+    try {
+      // força número
+      const numericId = Number(id)
+      console.log('[UI] chamando store.excluirChamado com id (number):', numericId)
+
+      await store.excluirChamado(numericId)
+
+      // recarrega a lista do backend pra garantir sincronia
+      await store.carregarChamados()
+
+      $q.notify({ type: 'positive', message: 'Chamado excluído!' })
+    } catch (err) {
+      console.error('[UI] erro ao excluir chamado:', err)
+      $q.notify({ type: 'negative', message: 'Erro ao excluir chamado: ' + (err?.message || '') })
+    }
+  })
 }
 
+
+// ===== Cor por status =====
 function getCorStatus(status) {
   switch (status) {
     case 'Aberto': return 'orange'
