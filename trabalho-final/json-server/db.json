@@ -34,6 +34,11 @@
       "id": 7,
       "email": "igor@igor.com",
       "senha": "teste123@A"
+    },
+    {
+      "id": 8,
+      "email": "teste@teste.com",
+      "senha": "Teste123@"
     }
   ],
   "clientes": [
@@ -92,13 +97,13 @@
       "status": true
     },
     {
-      "id": 7,
-      "razao_social": "testeeee",
-      "nome_fantasia": "teste",
-      "cnpj": "23.432.434/4233-41",
-      "email": "teste@teste.com",
-      "telefone": "(23) 42352-3543",
-      "status": true
+      "razao_social": "Teste Novo Cliente",
+      "nome_fantasia": "New Client",
+      "cnpj": "98.347.652/0348-56",
+      "email": "novocliente@cliente.com",
+      "telefone": "(34) 98573-4908",
+      "status": false,
+      "id": 8
     }
   ],
   "responsaveis": [
@@ -122,6 +127,13 @@
       "email": "novoresponsavel@new.com",
       "telefone": "(23) 23534-6457",
       "ativo": false
+    },
+    {
+      "id": 5,
+      "nome": "Novo Responsável",
+      "email": "newrespons@aksfh.mmmm",
+      "telefone": "(98) 56340-8568",
+      "ativo": true
     }
   ],
   "status_chamados": [
@@ -136,6 +148,12 @@
       "descricao": "Recusado",
       "cor": "#ff00ff",
       "ativo": false
+    },
+    {
+      "id": 3,
+      "descricao": "Aprovado",
+      "cor": "#0000ff",
+      "ativo": true
     }
   ],
   "departamentos": [
@@ -153,6 +171,11 @@
       "id": 3,
       "nome": "RH",
       "ativo": true
+    },
+    {
+      "id": 4,
+      "nome": "QA",
+      "ativo": false
     }
   ],
   "chamados": [
